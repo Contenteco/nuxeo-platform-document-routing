@@ -228,7 +228,7 @@
     </layout>
     
     <layout name="document_route_header">
-      <!--@since 7.5.1.1-SNAPSHOT -->
+      <!--@since 5.7.1.1-SNAPSHOT -->
       <templates>
         <template mode="any">/layouts/layout_div_template.xhtml</template>
       </templates>
@@ -243,7 +243,7 @@
     </layout>
     
     <layout name="document_route_models_listing_ajax">
-      <!--@since 7.5.1.1-SNAPSHOT -->
+      <!--@since 5.7.1.1-SNAPSHOT -->
       <templates>
         <template mode="any">
           /layouts/layout_listing_ajax_template.xhtml
