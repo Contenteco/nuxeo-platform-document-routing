@@ -104,6 +104,8 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
 
     @Test
     public void testStartWorkflowOperation() throws Exception {
+        log.debug("testStartWorkflowOperation: Test clean-up, count no of routes:"
+                + session.query("Select * from DocumentRoute").size());
         DocumentModel node1 = createNode(routeDoc, "node1", session);
         node1.setPropertyValue(GraphNode.PROP_START, Boolean.TRUE);
         node1.setPropertyValue(GraphNode.PROP_STOP, Boolean.TRUE);
@@ -182,6 +184,8 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testTasksOperations() throws Exception {
+        log.debug("testTasksOperations: Test clean-up, count no of routes:"
+                + session.query("Select * from DocumentRoute").size());
         routeDoc = session.saveDocument(routeDoc);
         DocumentModel node1 = createNode(routeDoc, "node1", session);
         node1.setPropertyValue(GraphNode.PROP_START, Boolean.TRUE);
