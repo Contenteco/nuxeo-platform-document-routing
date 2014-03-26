@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.automation.AutomationService;
@@ -57,8 +56,8 @@ import com.google.inject.Inject;
  * @since 5.7.2
  */
 @RunWith(FeaturesRunner.class)
-@Features({ TransactionalFeature.class, CoreFeature.class,
-        AutomationFeature.class })
+@Features({ WorkflowFeature.class, TransactionalFeature.class,
+        CoreFeature.class, AutomationFeature.class })
 @Deploy({
         "org.nuxeo.ecm.platform.content.template", //
         "org.nuxeo.ecm.automation.core", //
@@ -110,14 +109,13 @@ public class WorkflowEscalationTest extends AbstractGraphRouteTest {
     @Before
     public void setUp() throws Exception {
         assertNotNull(routing);
+        routing.invalidateRouteModelsCache();
         doc = session.createDocumentModel("/", "file", "File");
         doc.setPropertyValue("dc:title", "file");
         doc = session.createDocument(doc);
         routeDoc = createRoute("myroute", session);
     }
 
-    // NXP-12955: disabled because failing randomly
-    @Ignore
     @Test
     public void testEscalationSingleExecution() throws Exception {
         routeDoc = session.saveDocument(routeDoc);
@@ -264,10 +262,8 @@ public class WorkflowEscalationTest extends AbstractGraphRouteTest {
 
         DocumentModel r = session.getDocument(route.getDocument().getRef());
         nodeDoc = session.getDocument(new IdRef(node.getDocument().getId()));
-        assertEquals("foo",
-                r.getPropertyValue("fctroute1:stringfield"));
-        assertEquals("bar",
-                nodeDoc.getPropertyValue("fctnd1:stringfield2"));
+        assertEquals("foo", r.getPropertyValue("fctroute1:stringfield"));
+        assertEquals("bar", nodeDoc.getPropertyValue("fctnd1:stringfield2"));
 
     }
 

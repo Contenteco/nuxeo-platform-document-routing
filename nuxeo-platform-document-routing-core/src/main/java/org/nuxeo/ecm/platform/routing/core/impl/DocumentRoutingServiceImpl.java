@@ -1271,4 +1271,9 @@ public class DocumentRoutingServiceImpl extends DefaultComponent implements
             }
         }.runUnrestricted();
     }
+
+    @Override
+    public void invalidateRouteModelsCache() {
+        modelsChache.invalidateAll();
+    }
 }

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +37,10 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
+import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.test.CoreFeature;
+import org.nuxeo.ecm.core.test.RepositorySettings;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.ecm.platform.routing.api.DocumentRoute;
@@ -60,7 +63,7 @@ import com.ibm.icu.util.Calendar;
  * @since 5.7.2
  */
 @RunWith(FeaturesRunner.class)
-@Features({ CoreFeature.class, AutomationFeature.class })
+@Features({ WorkflowFeature.class, CoreFeature.class, AutomationFeature.class })
 @Deploy({
         "org.nuxeo.ecm.platform.content.template", //
         "org.nuxeo.ecm.automation.core", //
@@ -85,6 +88,9 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
     private Log log = LogFactory.getLog(WorkflowOperationsTest.class);
 
     @Inject
+    protected RepositorySettings repo;
+
+    @Inject
     protected CoreSession session;
 
     @Inject
@@ -96,6 +102,13 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
     @Before
     public void setUp() throws Exception {
         assertNotNull(routing);
+        routing.invalidateRouteModelsCache();
+        if (session.exists(new PathRef("/myroute"))) {
+            log.error("my route already exist, trying to cleanup");
+            session.removeChildren(new PathRef("/"));
+            session.save(); // force flush for traces
+            Assert.assertFalse(session.exists(new PathRef("/myroute")));
+        }
         doc = session.createDocumentModel("/", "file", "File");
         doc.setPropertyValue("dc:title", "file");
         doc = session.createDocument(doc);
@@ -104,8 +117,6 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
 
     @Test
     public void testStartWorkflowOperation() throws Exception {
-        log.debug("testStartWorkflowOperation: Test clean-up, count no of routes:"
-                + session.query("Select * from DocumentRoute").size());
         DocumentModel node1 = createNode(routeDoc, "node1", session);
         node1.setPropertyValue(GraphNode.PROP_START, Boolean.TRUE);
         node1.setPropertyValue(GraphNode.PROP_STOP, Boolean.TRUE);
@@ -184,8 +195,6 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testTasksOperations() throws Exception {
-        log.debug("testTasksOperations: Test clean-up, count no of routes:"
-                + session.query("Select * from DocumentRoute").size());
         routeDoc = session.saveDocument(routeDoc);
         DocumentModel node1 = createNode(routeDoc, "node1", session);
         node1.setPropertyValue(GraphNode.PROP_START, Boolean.TRUE);
