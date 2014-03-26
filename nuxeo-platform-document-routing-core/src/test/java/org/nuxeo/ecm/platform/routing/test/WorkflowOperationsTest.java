@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,6 +82,8 @@ import com.ibm.icu.util.Calendar;
 @RepositoryConfig(cleanup = Granularity.METHOD)
 public class WorkflowOperationsTest extends AbstractGraphRouteTest {
 
+    private Log log = LogFactory.getLog(WorkflowOperationsTest.class);
+
     @Inject
     protected CoreSession session;
 
@@ -131,6 +135,7 @@ public class WorkflowOperationsTest extends AbstractGraphRouteTest {
 
         DocumentModel routeInstance = session.getDocument(new IdRef(
                 (String) ctx.get("WorkflowId")));
+        log.debug("RouteInstanceId: " + routeInstance.getId());
         GraphRoute graph = routeInstance.getAdapter(GraphRoute.class);
         Map<String, Serializable> vars = graph.getVariables();
         assertEquals(routeInstance.getPropertyValue("fctroute1:stringfield"),
