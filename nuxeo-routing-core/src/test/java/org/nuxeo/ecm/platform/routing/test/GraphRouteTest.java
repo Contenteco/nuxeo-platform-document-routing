@@ -76,8 +76,8 @@ import org.nuxeo.runtime.transaction.TransactionHelper;
 import com.google.inject.Inject;
 
 @RunWith(FeaturesRunner.class)
-@Features({ TransactionalFeature.class, CoreFeature.class,
-        AutomationFeature.class })
+@Features({TransactionalFeature.class,
+        CoreFeature.class, AutomationFeature.class })
 @Deploy({
         "org.nuxeo.ecm.platform.content.template", //
         "org.nuxeo.ecm.automation.core", //
@@ -126,7 +126,7 @@ public class GraphRouteTest extends AbstractGraphRouteTest {
     @Before
     public void setUp() throws Exception {
         assertNotNull(routing);
-
+        routing.invalidateRouteModelsCache();
         doc = session.createDocumentModel("/", "file", "File");
         doc.setPropertyValue("dc:title", "file");
         doc = session.createDocument(doc);
@@ -1111,7 +1111,7 @@ public class GraphRouteTest extends AbstractGraphRouteTest {
         setTransitions(node1,
                 transition("trans1", "node2", "true", "testchain_title1"));
 
-        node1.setPropertyValue("rnode:taskAssigneesExpr", "\"Administrator\"");
+        node1.setPropertyValue("rnode:taskAssigneesExpr", "\"system\"");
         node1.setPropertyValue("rnode:taskDueDateExpr", "CurrentDate.days(1)");
         node1.setPropertyValue(GraphNode.PROP_HAS_TASK, Boolean.TRUE);
         node1 = session.saveDocument(node1);
@@ -1123,7 +1123,7 @@ public class GraphRouteTest extends AbstractGraphRouteTest {
 
         session.save();
         instantiateAndRun(session);
-
+        session.save();
         List<Task> tasks = taskService.getTaskInstances(doc,
                 (NuxeoPrincipal) session.getPrincipal(), session);
         assertNotNull(tasks);
@@ -1209,7 +1209,6 @@ public class GraphRouteTest extends AbstractGraphRouteTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore
     public void testRestartWorkflowOperation() throws Exception {
         assertEquals("file", doc.getTitle());
         DocumentModel node1 = createNode(routeDoc, "node1", session);
